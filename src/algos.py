@@ -14,8 +14,10 @@ class Algorithms:
         length = column.shape[0]
         for i in range(length):
             d += column[i]
+            if d == 0:
+                continue
             prob = column[i] / d
-            if numpy.random.choice([True, False], p=[prob, 1-prob]):
+            if np.random.choice([True, False], p=[prob, 1-prob]):
                 index = i
                 value = column[i]
         
