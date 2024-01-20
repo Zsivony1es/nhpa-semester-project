@@ -1,6 +1,8 @@
 import numpy as np
 import math
 
+from helpers import Helpers
+
 
 class Algorithms:
     def __init__(self):
@@ -30,7 +32,7 @@ class Algorithms:
             if d == 0:
                 continue
             prob = val / d
-            if np.random.choice([True, False], p=[prob, 1 - prob]):
+            if Helpers.random_onezero(prob):
                 index = i
                 value = val
 
@@ -61,3 +63,20 @@ class Algorithms:
             R[t, :] = B[i_t, :] / math.sqrt(c * prob[i_t])
 
         return C @ R
+
+    def elementwise_mult(A: np.ndarray, B: np.ndarray, prob_A: np.ndarray, prob_B: np.ndarray) -> np.ndarray:
+        assert A.shape[1] == B.shape[0], f"The dimensions of A ({A.shape}) and B ({B.shape}) don't match!"
+        assert A.shape == prob_A.shape, f"The dimensions of A ({A.shape}) and B ({prob_A.shape}) don't match!"
+        assert B.shape == prob_B.shape, f"The dimensions of A ({B.shape}) and B ({prob_B.shape}) don't match!"
+        assert np.isclose(prob_A.sum(), 1) and np.isclose(prob_B.sum(), 1), \
+            "The entries in the probability matrices should add up to 1!"
+
+        S = np.zeros((A.shape[0], A.shape[1]))
+        R = np.zeros((B.shape[0], B.shape[1]))
+
+        for i in range(A.shape[0]):
+            for j in range(A.shape[1]):
+                if Helpers.random_onezero(prob_A[i, j]):
+                    S[i, j] = A[i, j] / prob_A[i, j]
+
+        return S @ R
