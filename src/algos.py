@@ -5,6 +5,17 @@ import math
 class Algorithms:
     def __init__(self):
         pass
+    
+    def get_optimal_probdist(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+        f"""
+        Compute the optimal probability distribution for the Basic Matrix Multiplication algorithm
+        """
+        total_AiBi = 0
+        prob = np.empty(A.shape[1])
+        for i in range(A.shape[1]):
+            prob[i] = np.linalg.norm(Algorithms.select(A[:, i])) * np.linalg.norm(Algorithms.select(B[i, :]))
+            total_AiBi += prob[i]
+        return prob / total_AiBi
 
     def select(column: np.ndarray) -> (int, float):
 
@@ -34,18 +45,9 @@ class Algorithms:
 
         return index, column[index]
 
-    def basic_matrix_mult(A: np.ndarray, B: np.ndarray, c: int) -> np.ndarray:
+    def basic_matrix_mult(A: np.ndarray, B: np.ndarray, c: int, prob: np.ndarray) -> np.ndarray:
         assert A.shape[1] == B.shape[0], f"The dimensions of A ({A.shape}) and B ({B.shape}) don't match!"
         assert 1 <= c <= A.shape[1], f"The c value must be between 1 and {A.shape[1]}!"
-
-        # Create the probability distribution
-        total_AiBi = 0
-        prob = np.empty(A.shape[1])
-        for i in range(A.shape[1]):
-            prob[i] = np.linalg.norm(Algorithms.select(A[:, i])) * np.linalg.norm(Algorithms.select(B[i, :]))
-            total_AiBi += prob[i]
-        prob /= total_AiBi
-
         assert np.isclose(prob.sum(), 1), "The probabilities should add up to 1!"
 
         # Initialize C and R
