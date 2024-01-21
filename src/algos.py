@@ -8,6 +8,17 @@ class Algorithms:
     def __init__(self):
         pass
 
+    def get_semiopt_probdist(A: np.ndarray) -> np.ndarray:
+        f"""
+        Compute the a semi-optimal probability distribution for the Basic Matrix Multiplication algorithm 
+        using only one of the matrices.
+        """
+        A_frob_squared = np.linalg.norm(A) ** 2
+        prob = np.empty(A.shape[1])
+        for i in range(A.shape[1]):
+            prob[i] = (np.linalg.norm(Algorithms.select(A[:, i])) ** 2) / A_frob_squared
+        return prob
+
     def get_optimal_probdist(A: np.ndarray, B: np.ndarray) -> np.ndarray:
         f"""
         Compute the optimal probability distribution for the Basic Matrix Multiplication algorithm
