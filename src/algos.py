@@ -8,43 +8,6 @@ class Algorithms:
     def __init__(self):
         pass
 
-    def get_semiopt_probdist(M: np.ndarray,
-                             sampling="col") -> tuple[np.ndarray, float]:
-        f"""
-        :param A: The matrix used to compute the probability distribution
-        :param sampling: Sets whether to sample the matrix by column or row. Options: 'col', 'row', default: col
-        Compute the a semi-optimal probability distribution for the Basic Matrix Multiplication algorithm 
-        using only one of the matrices. (Found in the second/third row of Table 1 in the paper)
-        """
-        M_frobnorm_squared = np.linalg.norm(M) ** 2
-        if sampling == "col":
-            prob = np.empty(M.shape[1])
-            for i in range(M.shape[1]):
-                prob[i] = (Algorithms.select(M[:, i])[1] ** 2) / M_frobnorm_squared
-        elif sampling == "row":
-            prob = np.empty(M.shape[0])
-            for i in range(M.shape[0]):
-                prob[i] = (Algorithms.select(M[i, :])[1] ** 2) / M_frobnorm_squared
-        else:
-            raise Exception("Argument sampling must be either 'col' or 'row'!")
-
-        # I have to adjust the values by calculating beta, so it returns a valid probability distribution
-        beta = (1 / prob.sum())
-        prob = beta * prob
-        return prob, beta
-
-    def get_optimal_probdist(A: np.ndarray,
-                             B: np.ndarray) -> np.ndarray:
-        f"""
-        Compute the optimal probability distribution for the Basic Matrix Multiplication algorithm
-        """
-        total_AiBi = 0
-        prob = np.empty(A.shape[1])
-        for i in range(A.shape[1]):
-            prob[i] = np.linalg.norm(Algorithms.select(A[:, i])) * np.linalg.norm(Algorithms.select(B[i, :]))
-            total_AiBi += prob[i]
-        return prob / total_AiBi
-
     def calc_prob_bound_M(A: np.ndarray,
                           B: np.ndarray,
                           using_mx='A') -> float:
