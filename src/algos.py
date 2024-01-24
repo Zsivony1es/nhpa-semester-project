@@ -7,6 +7,7 @@ class Algorithms:
     def __init__(self):
         pass
 
+    @staticmethod
     def select(column: np.ndarray) -> tuple[int, float]:
         f"""
         The SELECT algorithm as described in the paper: https://doi.org/10.1137/S0097539704442684
@@ -28,6 +29,7 @@ class Algorithms:
 
         return index, value
 
+    @staticmethod
     def basic_matrix_mult(A: np.ndarray,
                           B: np.ndarray,
                           c: int,
@@ -52,6 +54,7 @@ class Algorithms:
 
         return C @ R
 
+    @staticmethod
     def elementwise_mult(A: np.ndarray,
                          B: np.ndarray,
                          prob_A: np.ndarray,
