@@ -38,7 +38,7 @@ class Algorithms:
         The Basic Matrix Multiplication algorithm as described in the paper: 
         https://doi.org/10.1137/S0097539704442684
         """
-        assert A.shape[1] == B.shape[0], f"The dimensions of A ({A.shape}) and B ({B.shape}) don't match!"
+        assert A.shape[1] == B.shape[0], f"The dimensions of A {A.shape} and B {B.shape} don't match!"
         assert 1 <= c <= A.shape[1], f"The c value must be between 1 and {A.shape[1]}!"
         assert np.isclose(prob.sum(), 1), f"The probabilities should add up to 1, but it is {prob.sum()}!"
 
