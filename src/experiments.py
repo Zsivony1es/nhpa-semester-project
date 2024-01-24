@@ -49,7 +49,6 @@ class Experiments:
                                  "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
             res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
-
             whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=delta)
 
             errors.append(np.linalg.norm(A @ B - res, ord='fro'))
@@ -87,7 +86,6 @@ class Experiments:
         bounds = []
         for i in range(a_dims.shape[0]):
             print(f"Calculating for A: ({a_dims[i, 0]} x {a_dims[i, 1]})   B: ({b_dims[i, 0]} x {b_dims[i, 1]})")
-            c = 50
 
             A, B = Helpers.generate_matrices(shape_a=a_dims[i],
                                              shape_b=b_dims[i],
@@ -106,8 +104,6 @@ class Experiments:
                                  "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
             res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
-
-            delta = 0.05
             whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=delta)
 
             errors.append(np.linalg.norm(A @ B - res, ord='fro'))
