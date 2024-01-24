@@ -42,7 +42,7 @@ class Bounds:
         :param c: The number of columns/rows sampled from the matrices
         :param delta: (1 - delta) is the probability that the error is lower than the calculated bound
         :param type: Which formula to use for the bound calculation.
-        Options: 'opt' (default), 'nearopt', 'nonopt'
+        Options: 'opt' (default), 'nearopt', 'nonopt' or 'uniform'
         :param beta: How similar the probabilities are to the optimal probability distribution
         :return: The calculated bound value
         Calculates the bound for ||AB - CR||_F with a given probability
@@ -52,10 +52,17 @@ class Bounds:
             whp_bound = eta / (beta * np.sqrt(c)) * np.linalg.norm(A, ord='fro') * np.linalg.norm(B, ord='fro')
             return whp_bound
         elif type == "nearopt":
+            # TODO
             M = Bounds.calc_prob_bound_m(A, B)
             eta = 1 + ( (np.linalg.norm(A, ord='fro') / np.linalg.norm(B, ord='fro'))
                    * M * np.sqrt((8 / beta) * np.log(1 / delta)))
         elif type == "nonopt":
+            # TODO
             pass
+        elif type == "uniform":
+            sum_rowcol_norms = 0.0
+            for index in range(A.shape[1]):
+                sum_rowcol_norms += (np.linalg.norm(A[:, index]) ** 2) * (np.linalg.norm(B[index, :]) ** 2)
+            return np.sqrt(A.shape[1] * sum_rowcol_norms / c)
         else:
             raise Exception("Argument 'type' must be either 'opt', 'nearopt' or 'nonopt'!")
