@@ -3,6 +3,7 @@ from typing import Union
 import numpy as np
 import scipy
 
+
 class Helpers:
     @staticmethod
     def normalize(vector: np.ndarray) -> np.ndarray:
@@ -24,7 +25,7 @@ class Helpers:
             b = np.random.rand(shape_b[0], shape_b[1])
         elif matrix_type == "sparse":
             a = scipy.sparse.random(shape_a[0], shape_a[1], density=0.01).toarray()
-            b = scipy.sparse.random(shape_a[0], shape_a[1], density=0.01).toarray()
+            b = scipy.sparse.random(shape_b[0], shape_b[1], density=0.01).toarray()
         else:
             raise ValueError("Invalid matrix type!")
 
