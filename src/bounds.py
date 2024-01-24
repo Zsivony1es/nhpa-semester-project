@@ -6,7 +6,8 @@ class Bounds:
     Calculate probability bounds for the accuracy of the matrix multiplication algoritmhs.
     """
 
-    def calc_prob_bound_M(A: np.ndarray,
+    @staticmethod
+    def calc_prob_bound_m(A: np.ndarray,
                           B: np.ndarray,
                           using_mx='A') -> float:
         assert A.shape[1] == B.shape[0], "Number of columns in A must be equal to the number of rows in B"
@@ -28,6 +29,7 @@ class Bounds:
 
         return np.max(max_ratios)
 
+    @staticmethod
     def calculate_prob_bound(A: np.ndarray,
                              B: np.ndarray,
                              c: int,
@@ -50,7 +52,7 @@ class Bounds:
             whp_bound = eta / (beta * np.sqrt(c)) * np.linalg.norm(A, ord='fro') * np.linalg.norm(B, ord='fro')
             return whp_bound
         elif type == "nearopt":
-            M = Bounds.calc_prob_bound_M(A, B)
+            M = Bounds.calc_prob_bound_m(A, B)
             eta = 1 + ( (np.linalg.norm(A, ord='fro') / np.linalg.norm(B, ord='fro'))
                    * M * np.sqrt((8 / beta) * np.log(1 / delta)))
         elif type == "nonopt":

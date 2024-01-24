@@ -7,6 +7,7 @@ class Distributions:
     matrix multiplication algorithms.
     """
 
+    @staticmethod
     def get_semiopt_probdist(M: np.ndarray,
                              sampling="col") -> tuple[np.ndarray, float]:
         f"""
@@ -32,6 +33,7 @@ class Distributions:
         prob = beta * prob
         return prob, beta
 
+    @staticmethod
     def get_optimal_probdist(A: np.ndarray,
                              B: np.ndarray) -> np.ndarray:
         f"""
@@ -44,6 +46,7 @@ class Distributions:
             total_AiBi += prob[i]
         return prob / total_AiBi
 
+    @staticmethod
     def get_opt_prodist_elementwise(A: np.ndarray,
                                     B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
