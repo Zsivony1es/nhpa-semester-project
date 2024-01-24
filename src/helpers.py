@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 import scipy
 
@@ -14,8 +16,8 @@ class Helpers:
         return np.random.choice([True, False], p=[prob, 1 - prob])
 
     @staticmethod
-    def generate_matrices(shape_a: tuple[int, int],
-                          shape_b: tuple[int, int],
+    def generate_matrices(shape_a: Union[tuple[int, int], np.ndarray],
+                          shape_b: Union[tuple[int, int], np.ndarray],
                           matrix_type: str = "dense") -> tuple[np.ndarray, np.ndarray]:
         if matrix_type == "dense":
             a = np.random.rand(shape_a[0], shape_a[1])

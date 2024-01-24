@@ -1,6 +1,7 @@
 import numpy as np
 from algos import Algorithms
 
+
 class Distributions:
     f"""
     The class contains all methods related to calculating probability distributions for the randomized
@@ -8,10 +9,18 @@ class Distributions:
     """
 
     @staticmethod
-    def get_semiopt_probdist(M: np.ndarray,
-                             sampling="col") -> tuple[np.ndarray, float]:
+    def get_uniform_probdist_bmm(n: int) -> np.ndarray:
         f"""
-        :param A: The matrix used to compute the probability distribution
+        :param n: The matching dimension of the two matrices, which will be multiplied together
+        :return: A uniform probability distribution
+        """
+        return np.full(n, 1 / n)
+
+    @staticmethod
+    def get_semiopt_probdist_bmm(M: np.ndarray,
+                                 sampling="col") -> tuple[np.ndarray, float]:
+        f"""
+        :param M: The matrix used to compute the probability distribution
         :param sampling: Sets whether to sample the matrix by column or row. Options: 'col', 'row', default: col
         Compute the a semi-optimal probability distribution for the Basic Matrix Multiplication algorithm 
         using only one of the matrices. (Found in the second/third row of Table 1 in the paper)
@@ -34,7 +43,7 @@ class Distributions:
         return prob, beta
 
     @staticmethod
-    def get_optimal_probdist(A: np.ndarray,
+    def get_opt_probdist_bmm(A: np.ndarray,
                              B: np.ndarray) -> np.ndarray:
         f"""
         Compute the optimal probability distribution for the Basic Matrix Multiplication algorithm
@@ -57,8 +66,10 @@ class Distributions:
         dim = shape[0]
         p = np.empty(shape)
         q = np.empty(shape)
+
         A_norm = np.linalg.norm(A)
         B_norm = np.linalg.norm(B)
+
         l = (A_norm ** 2) / (A.max() ** 2)
         k = (B_norm ** 2) / (B.max() ** 2)
 
@@ -66,17 +77,16 @@ class Distributions:
             for j in range(dim):
                 if np.abs(A[i, j]) > (A_norm * np.log(2 * dim) ** 3) / np.sqrt(2 * dim * l):
                     p[i, j] = min(1,
-                                  (l * A[i, j] ** 2) / (A_norm ** 2) )
+                                  (l * A[i, j] ** 2) / (A_norm ** 2))
                 else:
                     p[i, j] = min(1,
                                   (np.sqrt(l) * np.abs(A[i, j]) * np.log(2 * dim) ** 3) / (np.sqrt(2 * dim) * A_norm))
 
                 if np.abs(B[i, j]) > (B_norm * np.log(2 * dim) ** 3) / np.sqrt(2 * dim * k):
                     q[i, j] = min(1,
-                                  (k * B[i, j] ** 2) / (B_norm ** 2) )
+                                  (k * B[i, j] ** 2) / (B_norm ** 2))
                 else:
                     q[i, j] = min(1,
                                   (np.sqrt(k) * np.abs(B[i, j]) * np.log(2 * dim) ** 3) / (np.sqrt(2 * dim) * B_norm))
 
         return p, q
-
