@@ -1,4 +1,7 @@
 import numpy as np
+import logging
+import time
+
 from algos import Algorithms
 
 
@@ -14,7 +17,12 @@ class Distributions:
         :param n: The matching dimension of the two matrices, which will be multiplied together
         :return: A uniform probability distribution
         """
-        return np.full(n, 1 / n)
+        logging.debug(f"Getting uniform probability distribution for n={n}...")
+        start = time.time()
+        ret_val = np.full(n, 1 / n)
+        end = time.time()
+        logging.debug(f"Uniform probability distribution for n={n} generated in {(end - start) * 1000}ms!")
+        return ret_val
 
     @staticmethod
     def get_semiopt_probdist_bmm(M: np.ndarray,
@@ -48,12 +56,18 @@ class Distributions:
         f"""
         Compute the optimal probability distribution for the Basic Matrix Multiplication algorithm
         """
+        logging.debug(f"Generating optimal probability distribution for BMM A: {A.shape}; B: {B.shape}...")
+        start = time.time()
         total_AiBi = 0
         prob = np.empty(A.shape[1])
         for i in range(A.shape[1]):
             prob[i] = np.linalg.norm(Algorithms.select(A[:, i])) * np.linalg.norm(Algorithms.select(B[i, :]))
             total_AiBi += prob[i]
-        return prob / total_AiBi
+        ret_val = prob / total_AiBi
+        end = time.time()
+        logging.debug(f"Optimal probability distribution for BMM (A: {A.shape}; B: {B.shape})"
+                      f" generated in {(end - start) * 1000}ms!")
+        return ret_val
 
     @staticmethod
     def get_opt_prodist_elementwise(A: np.ndarray,
