@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from helpers import Helpers
 from algos import Algorithms
@@ -98,7 +100,9 @@ class Experiments:
             elif prob_dist_type == "nonopt":
                 pass
             elif prob_dist_type == "uniform":
-                prob = Distributions.get_uniform_probdist_bmm(a_dims[i, 1])
+                n = a_dims[i, 1]
+                logging.debug(f"n = {n}")
+                prob = Distributions.get_uniform_probdist_bmm(n)
             else:
                 raise ValueError("Invalid probability distribution type! " +
                                  "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
