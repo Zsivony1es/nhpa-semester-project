@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 from helpers import Helpers
+from matrix_gen import MatrixGenerator
 from algos import Algorithms
 from bounds import Bounds
 from distributions import Distributions
@@ -14,6 +15,7 @@ class Experiments:
                              shape_b: tuple[int, int],
                              list_c: np.ndarray,
                              matrix_type: str = "dense",
+                             entries_type: str = "frac",
                              prob_dist_type: str = "opt",
                              delta: float = 0.05) -> tuple[np.ndarray, np.ndarray]:
         f"""
@@ -23,6 +25,10 @@ class Experiments:
          :param shape_b: shape of the B matrix
          :param list_c: A NumPy array containing the number of columns, which should be sampled in a specific iteration
          :param matrix_type: The type of matrix to be generated. Options are 'dense' and 'sparse'. (Default: 'dense')
+         :param entries_type: Options: 
+            'frac' - generates uniformly distributed values on the interval [0,1)
+            'int' - generates integer only values from 0 - 9
+            'float' - generates floats from the interval [1,11)
          :param prob_dist_type: Used probability distribution type. Options are 'opt', 'nearopt', 'nonopt', 'uniform'.
           (Default: 'opt')
          :param delta: The probability that the calculated accuracy metric will be beyond the calculated bound
@@ -31,12 +37,17 @@ class Experiments:
         """
         errors = []
         bounds = []
+        matrixgen = MatrixGenerator()
+        matrixgen.set_matrix_type(matrix_type)
+        matrixgen.set_entries_type(entries_type)
 
         for c in list_c:
             print(f"Calculating for c = {c}...")
-            A, B = Helpers.generate_matrices(shape_a=shape_a,
-                                             shape_b=shape_b,
-                                             matrix_type=matrix_type)
+
+            matrixgen.set_shape(shape_a)
+            A = matrixgen.generate()
+            matrixgen.set_shape(shape_b)
+            B = matrixgen.generate()
 
             if prob_dist_type == "opt":
                 prob = Distributions.get_opt_probdist_bmm(A, B)
@@ -63,6 +74,7 @@ class Experiments:
                              b_dims: np.ndarray,
                              c: int,
                              matrix_type: str = "dense",
+                             entries_type: str = "frac",
                              prob_dist_type: str = "opt",
                              delta: float = 0.05) -> tuple[np.ndarray, np.ndarray]:
         f"""
@@ -72,6 +84,10 @@ class Experiments:
          matrix to be generated. Has to match with row count of a_dims.
         :param c: The number of columns to be sampled from a matrix
         :param matrix_type: The type of matrix to be generated. Options are 'dense' and 'sparse'. (Default: 'dense')
+        :param entries_type: Options: 
+            'frac' - generates uniformly distributed values on the interval [0,1)
+            'int' - generates integer only values from 0 - 9
+            'float' - generates floats from the interval [1,11)
         :param prob_dist_type: Used probability distribution type. Options are 'opt', 'nearopt', 'nonopt', 'uniform'.
           (Default: 'opt')
         :param delta: The probability that the calculated accuracy metric will be beyond the calculated bound
@@ -83,15 +99,19 @@ class Experiments:
             assert a_dims[i, 1] == b_dims[i, 0], (f"The dimensions of the matrices don't match!"
                                                   f"A: ({a_dims[i, 0]} x {a_dims[i, 1]}) "
                                                   f"B: ({b_dims[i, 0]} x {b_dims[i, 1]})")
+        matrixgen = MatrixGenerator()
+        matrixgen.set_matrix_type(matrix_type)
+        matrixgen.set_entries_type(entries_type)
 
         errors = []
         bounds = []
         for i in range(a_dims.shape[0]):
             print(f"Calculating for A: ({a_dims[i, 0]} x {a_dims[i, 1]})   B: ({b_dims[i, 0]} x {b_dims[i, 1]})")
 
-            A, B = Helpers.generate_matrices(shape_a=a_dims[i],
-                                             shape_b=b_dims[i],
-                                             matrix_type=matrix_type)
+            matrixgen.set_shape(a_dims[i])
+            A = matrixgen.generate()
+            matrixgen.set_shape(b_dims[i])
+            B = matrixgen.generate()
 
             if prob_dist_type == "opt":
                 prob = Distributions.get_opt_probdist_bmm(A, B)
@@ -100,7 +120,7 @@ class Experiments:
             elif prob_dist_type == "nonopt":
                 pass
             elif prob_dist_type == "uniform":
-                n = a_dims[i, 1]
+                n = int(a_dims[i, 1])
                 logging.debug(f"n = {n}")
                 prob = Distributions.get_uniform_probdist_bmm(n)
             else:
