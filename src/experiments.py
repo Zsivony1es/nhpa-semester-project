@@ -17,7 +17,8 @@ class Experiments:
                              matrix_type: str = "dense",
                              entries_type: str = "frac",
                              prob_dist_type: str = "opt",
-                             delta: float = 0.05) -> tuple[np.ndarray, np.ndarray]:
+                             delta: float = 0.05,
+                             normalize_error = False) -> tuple[np.ndarray, np.ndarray]:
         f"""
         Generates two random matrices with dimensions :shape_a: and :shape_b: and runs the Basic Matrix Multiplication
          multiple times for each value in list_c standing for the number of columns sampled during selection.
@@ -32,6 +33,7 @@ class Experiments:
          :param prob_dist_type: Used probability distribution type. Options are 'opt', 'nearopt', 'nonopt', 'uniform'.
           (Default: 'opt')
          :param delta: The probability that the calculated accuracy metric will be beyond the calculated bound
+         :param normalize_error: If set to True, then the returned values will be divided by ||AB||_F
          :return: Two NumPy arrays containing the ||AB - CR||_F errors and the calculating upper bounds for these 
           values respectively.
         """
@@ -63,9 +65,16 @@ class Experiments:
 
             res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
             whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=delta)
+            AtimesB = A @ B
+            AtimesB_norm: float = np.linalg.norm(AtimesB)
+            unnormalized_error: float = np.linalg.norm(AtimesB - res, ord='fro')
 
-            errors.append(np.linalg.norm(A @ B - res, ord='fro'))
-            bounds.append(whp_bound)
+            if not normalize_error:
+                errors.append(unnormalized_error)
+                bounds.append(whp_bound)
+            else:
+                errors.append(unnormalized_error / AtimesB_norm)
+                bounds.append(whp_bound / AtimesB_norm)
 
         return np.array(errors), np.array(bounds)
 
