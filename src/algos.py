@@ -66,8 +66,6 @@ class Algorithms:
         assert A.shape[1] == B.shape[0], f"The dimensions of A ({A.shape}) and B ({B.shape}) don't match!"
         assert A.shape == prob_A.shape, f"The dimensions of A ({A.shape}) and B ({prob_A.shape}) don't match!"
         assert B.shape == prob_B.shape, f"The dimensions of A ({B.shape}) and B ({prob_B.shape}) don't match!"
-        assert np.isclose(prob_A.sum(), 1) and np.isclose(prob_B.sum(), 1), \
-            "The entries in the probability matrices should add up to 1!"
 
         S = np.zeros((A.shape[0], A.shape[1]))
         R = np.zeros((B.shape[0], B.shape[1]))
@@ -76,5 +74,10 @@ class Algorithms:
             for j in range(A.shape[1]):
                 if Helpers.random_onezero(prob_A[i, j]):
                     S[i, j] = A[i, j] / prob_A[i, j]
+
+        for i in range(B.shape[0]):
+            for j in range(B.shape[1]):
+                if Helpers.random_onezero(prob_B[i, j]):
+                    R[i, j] = B[i, j] / prob_B[i, j]
 
         return S @ R

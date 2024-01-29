@@ -70,8 +70,8 @@ class Distributions:
         return ret_val
 
     @staticmethod
-    def get_opt_prodist_elementwise(A: np.ndarray,
-                                    B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def get_opt_probdist_elementwise(A: np.ndarray,
+                                     B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Returns {p_ij} and {q_ij}, which are probability distributions to be used in the element-wise
         matrix multiplication algorithm. This assumes that we are multiplying square matrices, as per the paper.
