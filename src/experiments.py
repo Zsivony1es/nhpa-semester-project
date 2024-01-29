@@ -135,7 +135,7 @@ class Experiments:
                 logging.debug(f"n = {n}")
                 prob = Distributions.get_uniform_probdist_bmm(n)
             else:
-                raise ValueError("Invalid probability distribution type! " +
+                raise ValueError(f"Invalid probability distribution type: {prob_dist_type}! " +
                                  "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
             res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
