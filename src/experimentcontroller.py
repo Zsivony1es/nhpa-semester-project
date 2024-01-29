@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-from parso.normalizer import Normalizer
 
 from matrix_gen import MatrixGenerator
 from algos import Algorithms
@@ -12,12 +11,14 @@ from distributions import Distributions
 class ExperimentController:
 
     def __init__(self,
+                 algorithm: str = "bmm",
                  matrix_type: str = "dense",
                  entries_type: str = "frac",
                  prob_dist_type: str = "opt",
                  delta: float = 0.05,
                  normalize_error: bool = False):
         f"""
+        :param algorithm: Matrix multiplication algorithm to use. Options: 'bmm' and 'emm'
         :param matrix_type: The type of matrix to be generated. Options are 'dense' and 'sparse'. (Default: 'dense')
         :param entries_type: Options: 
             'frac' - generates uniformly distributed values on the interval [0,1)
@@ -28,11 +29,16 @@ class ExperimentController:
         :param delta: The probability that the calculated accuracy metric will be beyond the calculated bound
         :param normalize_error: If set to True, then the returned values will be divided by ||AB||_F
         """
+        self._algorithm = algorithm
         self._matrix_type = matrix_type
         self._entries_type = entries_type
         self._prob_dist_type = prob_dist_type
         self._delta = delta
         self._normalize_error = normalize_error
+
+    def set_algorithm(self,
+                      algorithm: str) -> None:
+        self._algorithm = algorithm
 
     def set_matrix_type(self,
                         matrix_type: str) -> None:
@@ -81,20 +87,40 @@ class ExperimentController:
             matrixgen.set_shape(shape_b)
             B = matrixgen.generate()
 
-            if self._prob_dist_type == "opt":
-                prob = Distributions.get_opt_probdist_bmm(A, B)
-            elif self._prob_dist_type == "nearopt":
-                pass
-            elif self._prob_dist_type == "nonopt":
-                pass
-            elif self._prob_dist_type == "uniform":
-                prob = Distributions.get_uniform_probdist_bmm(shape_a[1])
-            else:
-                raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
-                                 "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
+            if self._algorithm == "bmm":
+                if self._prob_dist_type == "opt":
+                    prob = Distributions.get_opt_probdist_bmm(A, B)
+                elif self._prob_dist_type == "nearopt":
+                    pass
+                elif self._prob_dist_type == "nonopt":
+                    pass
+                elif self._prob_dist_type == "uniform":
+                    prob = Distributions.get_uniform_probdist_bmm(shape_a[1])
+                else:
+                    raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
+                                     "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
-            res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
-            whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta)
+                res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
+                whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta)
+            elif self._algorithm == "emm":
+                if self._prob_dist_type == "opt":
+                    prob_a, prob_b = Distributions.get_opt_probdist_elementwise(A, B)
+                elif self._prob_dist_type == "nearopt":
+                    pass
+                elif self._prob_dist_type == "nonopt":
+                    pass
+                elif self._prob_dist_type == "uniform":
+                    prob_a = Distributions.get_uniform_probdist_emm(shape_a)
+                    prob_b = Distributions.get_uniform_probdist_emm(shape_b)
+                else:
+                    raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
+                                     "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
+
+                res = Algorithms.elementwise_mult(A=A, B=B, prob_a=prob_a, prob_b=prob_b)
+                whp_bound = Bounds.calc_opt_prob_bound_emm(A=A, B=B)
+            else:
+                raise ValueError(f"Invalid algorithm type!: {self._algorithm}")
+
             AtimesB = A @ B
             AtimesB_norm: float = np.linalg.norm(AtimesB)
             unnormalized_error: float = np.linalg.norm(AtimesB - res, ord='fro')
@@ -140,22 +166,43 @@ class ExperimentController:
             matrixgen.set_shape(b_dims[i])
             B = matrixgen.generate()
 
-            if self._prob_dist_type == "opt":
-                prob = Distributions.get_opt_probdist_bmm(A, B)
-            elif self._prob_dist_type == "nearopt":
-                raise NotImplementedError("Near-Opt not implemented")
-            elif self._prob_dist_type == "nonopt":
-                raise NotImplementedError("Non-Opt not implemented")
-            elif self._prob_dist_type == "uniform":
-                n = int(a_dims[i, 1])
-                logging.debug(f"n = {n}")
-                prob = Distributions.get_uniform_probdist_bmm(n)
-            else:
-                raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
-                                 "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
+            if self._algorithm == "bmm":
+                if self._prob_dist_type == "opt":
+                    prob = Distributions.get_opt_probdist_bmm(A, B)
+                elif self._prob_dist_type == "nearopt":
+                    raise NotImplementedError("Near-Opt not implemented")
+                elif self._prob_dist_type == "nonopt":
+                    raise NotImplementedError("Non-Opt not implemented")
+                elif self._prob_dist_type == "uniform":
+                    n = int(a_dims[i, 1])
+                    logging.debug(f"n = {n}")
+                    prob = Distributions.get_uniform_probdist_bmm(n)
+                else:
+                    raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
+                                     "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
-            res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
-            whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta)
+                res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
+                whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta)
+
+            elif self._algorithm == "emm":
+                if self._prob_dist_type == "opt":
+                    prob_a, prob_b = Distributions.get_opt_probdist_elementwise(A, B)
+                elif self._prob_dist_type == "nearopt":
+                    pass
+                elif self._prob_dist_type == "nonopt":
+                    pass
+                elif self._prob_dist_type == "uniform":
+                    prob_a = Distributions.get_uniform_probdist_emm(a_dims[i])
+                    prob_b = Distributions.get_uniform_probdist_emm(b_dims[i])
+                else:
+                    raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
+                                     "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
+
+                res = Algorithms.elementwise_mult(A=A, B=B, prob_a=prob_a, prob_b=prob_b)
+                whp_bound = Bounds.calc_opt_prob_bound_emm(A=A, B=B)
+            else:
+                raise ValueError(f"Invalid algorithm type!: {self._algorithm}")
+
             AtimesB = A @ B
             AtimesB_norm: float = np.linalg.norm(AtimesB)
             unnormalized_error: float = np.linalg.norm(AtimesB - res, ord='fro')
