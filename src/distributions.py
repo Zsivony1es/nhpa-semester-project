@@ -76,10 +76,13 @@ class Distributions:
         Returns {p_ij} and {q_ij}, which are probability distributions to be used in the element-wise
         matrix multiplication algorithm. This assumes that we are multiplying square matrices, as per the paper.
         """
-        shape = A.shape
-        dim = shape[0]
-        p = np.empty(shape)
-        q = np.empty(shape)
+
+        m = A.shape[0]
+        n = A.shape[1]
+        p = B.shape[1]
+
+        p_prob = np.empty(A.shape)
+        q_prob = np.empty(B.shape)
 
         A_norm = np.linalg.norm(A)
         B_norm = np.linalg.norm(B)
@@ -87,20 +90,22 @@ class Distributions:
         l = (A_norm ** 2) / (A.max() ** 2)
         k = (B_norm ** 2) / (B.max() ** 2)
 
-        for i in range(dim):
-            for j in range(dim):
-                if np.abs(A[i, j]) > (A_norm * np.log(2 * dim) ** 3) / np.sqrt(2 * dim * l):
-                    p[i, j] = min(1,
+        for i in range(m):
+            for j in range(n):
+                if np.abs(A[i, j]) > (A_norm * np.log(2 * n) ** 3) / np.sqrt(2 * n * l):
+                    p_prob[i, j] = min(1,
                                   (l * A[i, j] ** 2) / (A_norm ** 2))
                 else:
-                    p[i, j] = min(1,
-                                  (np.sqrt(l) * np.abs(A[i, j]) * np.log(2 * dim) ** 3) / (np.sqrt(2 * dim) * A_norm))
+                    p_prob[i, j] = min(1,
+                                  (np.sqrt(l) * np.abs(A[i, j]) * np.log(2 * n) ** 3) / (np.sqrt(2 * n) * A_norm))
 
-                if np.abs(B[i, j]) > (B_norm * np.log(2 * dim) ** 3) / np.sqrt(2 * dim * k):
-                    q[i, j] = min(1,
+        for i in range(n):
+            for j in range(p):
+                if np.abs(B[i, j]) > (B_norm * np.log(2 * n) ** 3) / np.sqrt(2 * n * k):
+                    q_prob[i, j] = min(1,
                                   (k * B[i, j] ** 2) / (B_norm ** 2))
                 else:
-                    q[i, j] = min(1,
-                                  (np.sqrt(k) * np.abs(B[i, j]) * np.log(2 * dim) ** 3) / (np.sqrt(2 * dim) * B_norm))
+                    q_prob[i, j] = min(1,
+                                  (np.sqrt(k) * np.abs(B[i, j]) * np.log(2 * n) ** 3) / (np.sqrt(2 * n) * B_norm))
 
-        return p, q
+        return p_prob, q_prob
