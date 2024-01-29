@@ -7,6 +7,23 @@ class Bounds:
     """
 
     @staticmethod
+    def calc_opt_prob_bound_emm(A: np.ndarray,
+                                B: np.ndarray) -> float:
+        assert A.shape[0] == A.shape[1] and A.shape == B.shape, "This bound only works for square matrices!"
+        assert 2 * A.shape[0] >= np.log(2 * A.shape[0]) ** 6, "The dimension must satisfy the logarithmic constraint!"
+
+        A_norm = np.linalg.norm(A)
+        A_max = np.max(A)
+        B_norm = np.linalg.norm(B)
+        B_max = np.max(B)
+        l = np.min((A_norm ** 2) / (A_max ** 2), (B_norm ** 2) / (B_max ** 2))
+        n = A.shape[0]
+
+        retval = (20 * np.sqrt(n / l) + ((100 * n) / l) ) * A_norm * B_norm
+        return retval
+
+
+    @staticmethod
     def calc_prob_bound_m(A: np.ndarray,
                           B: np.ndarray,
                           using_mx='A') -> float:

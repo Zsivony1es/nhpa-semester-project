@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 import time
+from typing import Union
 
 from algos import Algorithms
 
@@ -22,6 +23,19 @@ class Distributions:
         ret_val = np.full(n, 1 / n)
         end = time.time()
         logging.debug(f"Uniform probability distribution for n={n} generated in {(end - start) * 1000}ms!")
+        return ret_val
+
+    @staticmethod
+    def get_uniform_probdist_emm(shape: Union[tuple[int, int], np.ndarray]) -> np.ndarray:
+        f"""
+            :param shape: The dimensions of a matrix
+            :return: A uniform probability distribution for all entries of the matrix
+        """
+        logging.debug(f"Getting uniform probability distribution for shape: {shape}...")
+        start = time.time()
+        ret_val = np.full(shape, 1 / (shape[0] * shape[1]) )
+        end = time.time()
+        logging.debug(f"Uniform probability distribution for shape {shape} generated in {(end - start) * 1000}ms!")
         return ret_val
 
     @staticmethod
