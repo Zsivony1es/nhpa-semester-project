@@ -169,6 +169,7 @@ class ExperimentController:
             if self._algorithm == "bmm":
                 if self._prob_dist_type == "opt":
                     prob = Distributions.get_opt_probdist_bmm(A, B)
+                    whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta, type='opt')
                 elif self._prob_dist_type == "nearopt":
                     raise NotImplementedError("Near-Opt not implemented")
                 elif self._prob_dist_type == "nonopt":
@@ -177,12 +178,12 @@ class ExperimentController:
                     n = int(a_dims[i, 1])
                     logging.debug(f"n = {n}")
                     prob = Distributions.get_uniform_probdist_bmm(n)
+                    whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta, type='opt')
                 else:
                     raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
                                      "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
                 res = Algorithms.basic_matrix_mult(A, B, c=c, prob=prob)
-                whp_bound = Bounds.calculate_prob_bound(A=A, B=B, c=c, delta=self._delta)
 
             elif self._algorithm == "emm":
                 if self._prob_dist_type == "opt":
@@ -198,8 +199,9 @@ class ExperimentController:
                     raise ValueError(f"Invalid probability distribution type: {self._prob_dist_type}! " +
                                      "Must be 'opt', 'nearopt', 'nonopt' or 'uniform'!")
 
-                res = Algorithms.elementwise_mult(A=A, B=B, prob_a=prob_a, prob_b=prob_b)
-                whp_bound = Bounds.calc_opt_prob_bound_emm(A=A, B=B)
+                whp_bound = Bounds.calc_opt_prob_bound_emm(A, B)
+                res = Algorithms.elementwise_mult(A=A, B=B, prob_A=prob_a, prob_B=prob_b)
+
             else:
                 raise ValueError(f"Invalid algorithm type!: {self._algorithm}")
 
