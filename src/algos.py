@@ -1,6 +1,6 @@
 import numpy as np
 
-from helpers import Helpers
+from utilities import Utilities
 
 
 class Algorithms:
@@ -23,7 +23,7 @@ class Algorithms:
             if d == 0:
                 continue
             prob = val / d
-            if Helpers.random_onezero(prob):
+            if Utilities.random_onezero(prob):
                 index = i
                 value = val
 
@@ -72,12 +72,12 @@ class Algorithms:
 
         for i in range(A.shape[0]):
             for j in range(A.shape[1]):
-                if Helpers.random_onezero(prob_A[i, j]):
+                if Utilities.random_onezero(prob_A[i, j]):
                     S[i, j] = A[i, j] / prob_A[i, j]
 
         for i in range(B.shape[0]):
             for j in range(B.shape[1]):
-                if Helpers.random_onezero(prob_B[i, j]):
+                if Utilities.random_onezero(prob_B[i, j]):
                     R[i, j] = B[i, j] / prob_B[i, j]
 
         return S @ R

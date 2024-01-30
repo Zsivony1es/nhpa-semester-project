@@ -1,10 +1,7 @@
-from typing import Union
-
 import numpy as np
-import scipy
 
 
-class Helpers:
+class Utilities:
     @staticmethod
     def normalize(vector: np.ndarray) -> np.ndarray:
         norm = vector.sum()
@@ -16,3 +13,9 @@ class Helpers:
     def random_onezero(prob: float) -> bool:
         return np.random.choice([True, False], p=[prob, 1 - prob])
 
+    @staticmethod
+    def map_to_type(num: int):
+        if num % 2 == 0:
+            return "uniform"
+        else:
+            return "optimal"
